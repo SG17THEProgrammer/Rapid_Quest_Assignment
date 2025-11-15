@@ -10,7 +10,7 @@ const mammoth = require("mammoth");
 const app = express();
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL , 
+    origin: `${process.env.FRONTEND_URL}` , 
     methods: "GET,POST,PUT,DELETE",
     credentials: true,
   })
@@ -21,7 +21,7 @@ app.use(
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Connect MongoDB (change URI if needed)
-mongoose.connect(`${process.env.MONGO_URL}/Rapid_Quest}`, {
+mongoose.connect(`${process.env.MONGO_URL}/Rapid_Quest`, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
