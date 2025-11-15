@@ -8,14 +8,17 @@ const pdfParse = require("pdf-parse");
 const mammoth = require("mammoth");
 
 const app = express();
+
 app.use(
   cors({
-    origin: `${process.env.FRONTEND_URL}` , 
+    origin: process.env.FRONTEND_URL , 
     methods: "GET,POST,PUT,DELETE",
     credentials: true,
   })
 
-);app.use(express.json());
+);
+
+app.use(express.json());
 
 // Serve uploaded files statically
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
