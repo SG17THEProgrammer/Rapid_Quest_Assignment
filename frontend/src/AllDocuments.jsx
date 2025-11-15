@@ -81,7 +81,7 @@ export default function AllDocuments({ allDocs }) {
       </Typography>
 
       <Grid container spacing={3}>
-        {visibleDocs?.reverse()?.map((doc) => (
+        {visibleDocs?.map((doc) => (
           <Grid item xs={12} sm={6} md={4} key={doc._id} sx={{width:"100%"}}>
             <Card
               sx={{

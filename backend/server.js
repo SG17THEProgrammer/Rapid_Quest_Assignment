@@ -8,8 +8,14 @@ const pdfParse = require("pdf-parse");
 const mammoth = require("mammoth");
 
 const app = express();
-app.use(cors());
-app.use(express.json());
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL , 
+    methods: "GET,POST,PUT,DELETE",
+    credentials: true,
+  })
+
+);app.use(express.json());
 
 // Serve uploaded files statically
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
@@ -131,9 +137,7 @@ app.get("/search", async (req, res) => {
   try {
     const q = req.query.q || "";
     if (!q.trim()) {
-      // return all docs (limited) if no query
-      const docs = await Document.find().sort({ createdAt: -1 }).limit(100);
-      return res.json(docs);
+      return res.json([]);
     }
 
     const results = await Document.find(
