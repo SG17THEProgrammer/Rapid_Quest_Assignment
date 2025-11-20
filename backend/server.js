@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
@@ -6,6 +8,8 @@ const path = require("path");
 const fs = require("fs");
 const pdfParse = require("pdf-parse");
 const mammoth = require("mammoth");
+
+
 
 const app = express();
 
@@ -23,7 +27,6 @@ app.use(express.json());
 // Serve uploaded files statically
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// Connect MongoDB (change URI if needed)
 mongoose.connect(`${process.env.MONGO_URL}/Rapid_Quest`, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -36,9 +39,10 @@ const DocumentSchema = new mongoose.Schema({
   tags: [String],
   fileType: String,
   fileUrl: String,
+  pdfText:String,
   createdAt: { type: Date, default: Date.now },
 });
-DocumentSchema.index({ title: "text", content: "text", tags: "text" });
+DocumentSchema.index({ title: "text", content: "text", tags: "text" , pdfText:"text" });
 const Document = mongoose.model("Document", DocumentSchema);
 
 // Multer storage config
@@ -116,14 +120,15 @@ app.post("/upload", upload.single("file"), async (req, res) => {
     }
 
     // prefer user-provided content if present else use extracted text
-    const finalContent = textContent && textContent.trim() ? textContent : extracted;
+    // const finalContent = textContent && textContent.trim() ? textContent : extracted;
 
     const doc = new Document({
       title: title || (req.file ? req.file.originalname : "Untitled"),
-      content: finalContent || "",
+      content: textContent || "",
       tags: tagsArr,
-      fileType: fileType || (finalContent ? "txt" : null),
+      fileType: fileType || (textContent ? "txt" : null),
       fileUrl,
+      pdfText: extracted
     });
 
     await doc.save();

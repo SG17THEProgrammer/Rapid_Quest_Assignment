@@ -8,6 +8,7 @@ import {
   Grid,
   Skeleton,
 } from "@mui/material";
+import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 
 const ITEMS_PER_LOAD = 6;
 
@@ -26,8 +27,8 @@ export default function AllDocuments({ allDocs }) {
   const loadMore = () => {
     if (loading) return;
 
-    const alreadyVisible = visibleDocs.length;
-    const totalDocs = allDocs.length;
+    const alreadyVisible = visibleDocs?.length;
+    const totalDocs = allDocs?.length;
 
     // If no more docs, stop
     if (alreadyVisible >= totalDocs) return;
@@ -35,7 +36,7 @@ export default function AllDocuments({ allDocs }) {
     setLoading(true);
 
     setTimeout(() => {
-      const nextDocs = allDocs.slice(
+      const nextDocs = allDocs?.slice(
         alreadyVisible,
         alreadyVisible + ITEMS_PER_LOAD
       );
@@ -74,15 +75,17 @@ export default function AllDocuments({ allDocs }) {
   // Stop showing the loader div if everything is loaded
   const noMoreDocs = visibleDocs?.length >= allDocs?.length;
 
+  console.log(allDocs);
+
   return (
     <Box sx={{ px: 3, py: 4 }}>
       <Typography variant="h5" fontWeight="bold" mb={3}>
-        All Documents
+        All Documents ({allDocs?.length} documents)
       </Typography>
 
       <Grid container spacing={3}>
         {visibleDocs?.map((doc) => (
-          <Grid item xs={12} sm={6} md={4} key={doc._id} sx={{width:"100%"}}>
+          <Grid item xs={12} sm={6} md={4} key={doc._id} sx={{ width: "100%" }}>
             <Card
               sx={{
                 height: "100%",
@@ -96,9 +99,18 @@ export default function AllDocuments({ allDocs }) {
               }}
             >
               <CardContent>
-                <Typography variant="h6" fontWeight="600" gutterBottom>
-                  {doc.title}
-                </Typography>
+                <Box sx={{display:"flex" , justifyContent:"space-between" , alignItems:"center" , marginBottom:"20px"}}>
+
+                  <Typography variant="h6" fontWeight="600" gutterBottom>
+                    {doc.title}
+                  </Typography>
+
+                  {doc?.fileUrl ? <a href={doc?.fileUrl} target="_blank" rel="noopener noreferrer">
+                    <PictureAsPdfIcon
+                      sx={{ fontSize: 40, color: "red", cursor: "pointer" }}
+                    />
+                  </a>:""}
+                </Box>
 
                 <Typography
                   variant="body2"
@@ -129,15 +141,7 @@ export default function AllDocuments({ allDocs }) {
 
         {/* Show skeleton only while loading */}
         {loading &&
-          Array.from({ length: 3 }).map((_, i) => (
-            <Grid item xs={12} sm={6} md={4} key={"sk" + i}>
-              <Card sx={{ padding: 2, borderRadius: 3 }}>
-                <Skeleton variant="rectangular" height={120} />
-                <Skeleton width="60%" sx={{ mt: 2 }} />
-                <Skeleton width="40%" />
-              </Card>
-            </Grid>
-          ))}
+         <Typography sx={{textAlign:'center' , width:"100%"}}>Loading....</Typography>}
       </Grid>
 
       {/* Lazy loader trigger */}

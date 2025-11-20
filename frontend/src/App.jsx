@@ -57,6 +57,7 @@ function App() {
       setUploadData({ title: "", content: "", tags: "", file: null });
       // optionally refresh documents / search results
       await searchDocs(); // if you want to refresh results immediately
+      getAllDocs()
     } else {
       alert("Upload failed");
     }
@@ -73,14 +74,14 @@ function App() {
 
   const [allDocs, setAllDocs] = useState()
 
+  const getAllDocs = async () => {
+    const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/alldocuments`);
+    setAllDocs(res.data);
+  }
   useEffect(() => {
-    const getAllDocs = async () => {
-      const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/alldocuments`);
-      setAllDocs(res.data);
-    }
+    
     getAllDocs()
-  }, [allDocs])
-
+  }, [])
   const docsRef = useRef(null);
 
   const scrollToDocs = () => {
