@@ -102,7 +102,7 @@ export default function AllDocuments({ allDocs }) {
                 <Box sx={{display:"flex" , justifyContent:"space-between" , alignItems:"center" , marginBottom:"20px"}}>
 
                   <Typography variant="h6" fontWeight="600" gutterBottom>
-                    {doc.title}
+                    {doc.title || 'N/A'}
                   </Typography>
 
                   {doc?.fileUrl ? <a href={doc?.fileUrl} target="_blank" rel="noopener noreferrer">
@@ -117,13 +117,13 @@ export default function AllDocuments({ allDocs }) {
                   sx={{ color: "grey.700", mb: 2 }}
                   noWrap
                 >
-                  {doc.content}
+                  {doc.content || 'N/A'}
                 </Typography>
 
                 <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
                   {doc.tags?.map((tag) => (
                     <Chip
-                      label={tag}
+                      label={tag || 'N/A'}
                       key={tag}
                       size="small"
                       sx={{

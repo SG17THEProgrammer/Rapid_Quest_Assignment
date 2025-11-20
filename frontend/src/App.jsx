@@ -16,17 +16,18 @@ import {
 import AllDocuments from "./AllDocuments";
 import { useEffect } from "react";
 import { useRef } from "react";
+import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 
 function App() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [selected, setSelected] = useState(null);
   const [uploadData, setUploadData] = useState({
-  title: "",
-  content: "",
-  tags: "",
-  file: null,
-});
+    title: "",
+    content: "",
+    tags: "",
+    file: null,
+  });
 
   const searchDocs = async () => {
     const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/search?q=${query}`);
@@ -35,37 +36,37 @@ function App() {
   };
 
   const uploadDoc = async () => {
-  try {
-    if (!uploadData.title && !uploadData.file) {
-      alert("Please provide a title or choose a file.");
-      return;
+    try {
+      if (!uploadData.title && !uploadData.file) {
+        alert("Please provide a title or choose a file.");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("title", uploadData.title);
+      formData.append("tags", uploadData.tags);
+      formData.append("content", uploadData.content);
+      if (uploadData.file) formData.append("file", uploadData.file);
+
+      const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/upload`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      if (res.data?.success) {
+        alert("Uploaded successfully!");
+        // reset
+        setUploadData({ title: "", content: "", tags: "", file: null });
+        // optionally refresh documents / search results
+        await searchDocs(); // if you want to refresh results immediately
+        getAllDocs()
+      } else {
+        alert("Upload failed");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Upload error");
     }
-
-    const formData = new FormData();
-    formData.append("title", uploadData.title);
-    formData.append("tags", uploadData.tags);
-    formData.append("content", uploadData.content);
-    if (uploadData.file) formData.append("file", uploadData.file);
-
-    const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/upload`, formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
-
-    if (res.data?.success) {
-      alert("Uploaded successfully!");
-      // reset
-      setUploadData({ title: "", content: "", tags: "", file: null });
-      // optionally refresh documents / search results
-      await searchDocs(); // if you want to refresh results immediately
-      getAllDocs()
-    } else {
-      alert("Upload failed");
-    }
-  } catch (err) {
-    console.error(err);
-    alert("Upload error");
-  }
-};
+  };
 
   const openDoc = async (id) => {
     const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/documents/${id}`);
@@ -79,7 +80,7 @@ function App() {
     setAllDocs(res.data);
   }
   useEffect(() => {
-    
+
     getAllDocs()
   }, [])
   const docsRef = useRef(null);
@@ -198,16 +199,16 @@ function App() {
             >
               <CardContent>
                 <Typography variant="subtitle1" fontWeight="bold">
-                  {doc?.title}
+                  {doc?.title || 'N/A'}
                 </Typography>
 
                 <Typography variant="body2" color="text.secondary">
-                  {doc?.content.substring(0, 100)}...
+                  {doc?.content ? doc?.content.substring(0, 100) + '...' : 'N/A'}
                 </Typography>
 
                 <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
                   {doc?.tags?.map((tag) => (
-                    <Chip label={tag} key={tag} size="small" />
+                    <Chip label={tag || 'N/A'} key={tag} size="small" />
                   ))}
                 </Stack>
               </CardContent>
@@ -218,20 +219,30 @@ function App() {
         {/* Preview */}
         <Box width="60%"  >
           <Typography variant="h6">Preview</Typography>
+
           <Divider sx={{ mb: 2 }} />
           {selected ?
             <Card sx={{ p: 2, mb: 5 }}>
-              <Typography variant="h5" fontWeight="bold" gutterBottom>
-                {selected.title}
-              </Typography>
+              <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+
+                <Typography variant="h5" fontWeight="bold" gutterBottom>
+                  {selected.title || 'N/A'}
+                </Typography>
+
+                {selected?.fileUrl ? <a href={selected?.fileUrl} target="_blank" rel="noopener noreferrer">
+                  <PictureAsPdfIcon
+                    sx={{ fontSize: 40, color: "red", cursor: "pointer" }}
+                  />
+                </a> : ""}
+              </Box>
 
               <Typography variant="body1" sx={{ whiteSpace: "pre-line" }}>
-                {selected.content}
+                {selected.content || 'N/A'}
               </Typography>
 
               <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
                 {selected.tags?.map((tag) => (
-                  <Chip label={tag} key={tag} />
+                  <Chip label={tag || 'N/A'} key={tag} />
                 ))}
               </Stack>
             </Card>
